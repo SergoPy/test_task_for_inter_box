@@ -18,8 +18,13 @@ def scrape_ebay_images(url):
 
     image_urls = set()
     for image_element in image_elements:
-        image_url = image_element.get_attribute("data-zoom-src")
-        image_urls.add(image_url)
+        zoom_src = image_element.get_attribute("data-zoom-src")
+        src = image_element.get_attribute("src")
+
+        image_url = zoom_src if zoom_src else src
+
+        if image_url:
+            image_urls.add(image_url)
 
     driver.quit()
 
