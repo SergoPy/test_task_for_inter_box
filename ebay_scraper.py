@@ -22,9 +22,10 @@ def scrape_ebay_images(url):
             for image_element in image_elements
         }
 
-    imgbb_urls = [
-        upload_image_to_imgbb(save_image_from_url(image_url))
-        for image_url in image_urls if image_url
-    ]
+    imgbb_urls = set()
+    for image_url in image_urls:
+        imgbb_url = upload_image_to_imgbb(save_image_from_url(image_url))
+        if imgbb_url:
+            imgbb_urls.add(imgbb_url)
 
-    return [url for url in imgbb_urls if url]
+    return list(imgbb_urls)
