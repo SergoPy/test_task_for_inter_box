@@ -17,6 +17,9 @@ def write_links_to_sheets(sheet_key, photo_links):
 
         row_number = filled_cells + 2
 
+        if not photo_links:
+            photo_links.append("-")
+            
         for i, photo_link in enumerate(photo_links):
             try:
                 sheet.update_cell(row_number, i + 2, photo_link)
