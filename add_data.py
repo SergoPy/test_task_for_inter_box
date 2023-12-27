@@ -15,7 +15,6 @@ def write_links_to_sheets(sheet_key, photo_links):
     filled_cells = sum(1 for value in column_values if value)
 
     row_number = filled_cells + 2
-    print(row_number)
 
     for i, photo_link in enumerate(photo_links):
         sheet.update_cell(row_number, i + 2, photo_link)

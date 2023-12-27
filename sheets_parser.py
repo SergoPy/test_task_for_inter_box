@@ -12,6 +12,13 @@ def parse_sheets_links(sheet_key, credentials_file):
 
     sheet = client.open_by_key(sheet_key).sheet1
 
+    range_to_clear = sheet.range("B3:K20")
+
+    for cell in range_to_clear:
+        cell.value = ''
+
+    sheet.update_cells(range_to_clear)
+
     links = sheet.col_values(1)[2:]
 
     return list(links)
