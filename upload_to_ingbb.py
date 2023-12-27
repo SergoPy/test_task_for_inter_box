@@ -11,16 +11,20 @@ import time
 
 
 def save_image_from_url(url):
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
 
-    parts = url.split("/")
-    desired_part = parts[-2] + parts[-1].split("-")[1]
-    save_path = "temporary_files/" + desired_part
+        parts = url.split("/")
+        desired_part = parts[-2] + parts[-1].split("-")[1]
+        save_path = "temporary_files/" + desired_part
 
-    img = Image.open(BytesIO(response.content))
-    img.save(save_path)
+        img = Image.open(BytesIO(response.content))
+        img.save(save_path)
 
-    return save_path
+        return save_path
+    except Exception as e:
+        print(f"Error saving image from URL '{url}': {e}")
+        return None
 
 
 def delete_image(file_path):
@@ -34,44 +38,44 @@ def delete_image(file_path):
 
 
 def upload_image_to_imgbb(image_path):
-    options = webdriver.ChromeOptions()
-    options.add_argument('--disable-extensions')
-    options.add_argument('--headless')  
-    options.add_argument('--disable-gpu')
-    options.add_argument('--no-sandbox')
-
-    driver = webdriver.Chrome()
-    pause_time = 1.5
-
     try:
-        driver.get("https://imgbb.com/")
+        driver = webdriver.Chrome()
+        pause_time = 1.5
 
-        wait = WebDriverWait(driver, 10)
-        upload_input = wait.until(
-            EC.presence_of_element_located((By.ID, "anywhere-upload-input"))
-        )
+        try:
+            driver.get("https://imgbb.com/")
 
-        upload_input.send_keys(os.path.abspath(image_path))
+            wait = WebDriverWait(driver, 10)
+            upload_input = wait.until(
+                EC.presence_of_element_located(
+                    (By.ID, "anywhere-upload-input"))
+            )
 
-        upload_btn = wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, "//button[@data-action='upload']"))
-        )
+            upload_input.send_keys(os.path.abspath(image_path))
 
-        body = driver.find_element(By.TAG_NAME, "button")
-        body.send_keys(Keys.END)
+            upload_btn = wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, "//button[@data-action='upload']"))
+            )
 
-        upload_btn.click()
+            body = driver.find_element(By.TAG_NAME, "button")
+            body.send_keys(Keys.END)
 
-        time.sleep(pause_time)
+            upload_btn.click()
 
-        uploaded_image_url = wait.until(
-            EC.presence_of_element_located(
-                (By.CLASS_NAME, "image-link"))
-        ).get_attribute("href")
+            time.sleep(pause_time)
 
-        delete_image(image_path)
+            uploaded_image_url = wait.until(
+                EC.presence_of_element_located(
+                    (By.CLASS_NAME, "image-link"))
+            ).get_attribute("href")
 
-        return uploaded_image_url
-    finally:
-        driver.quit()
+            delete_image(image_path)
+
+            return uploaded_image_url
+        finally:
+            driver.quit()
+
+    except Exception as e:
+        print(f"Error uploading image to ImgBB: {e}")
+        return None
